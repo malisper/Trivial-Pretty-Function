@@ -31,9 +31,10 @@
 (defmacro with-function-printer (printer fn)
   "Assign the printer that results from evaluating PRINTER, to the
    function that results from evaluating FN."
-  `(let ((f ,fn))
-     (setf (pretty-function fn) ,printer)
-     f))
+  (let ((gfn (gensym)))
+    `(let ((,gfn ,fn))
+       (setf (function-printer ,gfn) ,printer)
+       ,gfn)))
 
 (defmacro named-lambda (name lambda-list &body body)
   "Create a lambda function that is associated with NAME. Whenever the
