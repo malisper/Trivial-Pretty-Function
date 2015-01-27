@@ -18,11 +18,17 @@
 
 (defun enable-pretty-function-printing (&optional (priority 0) (table *print-pprint-dispatch*))
   "Enable pretty function printing. Return true if pretty function
-   printing was already enabled."
-  (progn
+   printing was previously disabled."
+  (prog2
     (set-pprint-dispatch 'function 'print-pretty-function priority table)
-    (prog1 (not *pretty-function-printing-enabled-p*)
-      (setf *pretty-function-printing-enabled-p* t))))
+    (not *pretty-function-printing-enabled-p*)
+    (setf *pretty-function-printing-enabled-p* t)))
+
+(defun disable-pretty-function-printing ()
+  "Disables pretty function printing. Returns true if pretty function
+   printing was previously enabled."
+  (prog1 *pretty-function-printing-enabled-p*
+    (setf *pretty-function-printing-enabled-p* nil)))
 
 (defun print-pretty-function (s fn)
   (let ((printer (function-printer fn)))
@@ -33,10 +39,12 @@
         (let ((*print-pretty* nil))
           (write fn :stream s)))))
 
-(defun with-function-printer (printer fn)
+(defmacro with-function-printer (printer fn)
   "Assign the printer that results from evaluating PRINTER, to the
    function that results from evaluating FN."
-  `(setf (gethash ,fn *fn-table*) ,printer))
+  `(let ((f ,fn))
+     (setf (gethash f *fn-table*) ,printer)
+     f))
 
 (defmacro named-lambda (name lambda-list &body body)
   "Create a lambda function that is associated with NAME. Whenever the
@@ -51,3 +59,9 @@
   `(with-function-printer (lambda (s)
                             (format s "#<named-lambda ~A>" ,name-form))
      (lambda ,lambda-list ,@body)))
+
+(defun clear-pretty-function-table ()
+  "Remove all printers associated with pretty functions."
+  (clrhash *fn-table*))
+
+(provide :pretty-function)

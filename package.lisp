@@ -6,7 +6,5 @@
            :named-lambda*
            :with-function-printer
 
-           :*pretty-function-printing-supported-p*
-           :print-pretty-function-table
            :clear-pretty-function-table
-           :get-function-printer))
+           :function-printer))
