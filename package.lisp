@@ -1,7 +1,7 @@
 (defpackage :trivial-pretty-function
   (:nicknames :tpf)
   (:use :cl :trivial-garbage)
-  (:export :enable-pretty-function-printing
+  (:export :print-functions-pretty
            :named-lambda
            :named-lambda*
            :with-function-printer

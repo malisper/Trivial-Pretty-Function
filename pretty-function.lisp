@@ -1,9 +1,9 @@
 (in-package :trivial-pretty-function)
 
-(defvar *pretty-function-printing-enabled-p* nil
+(defvar *print-functions-pretty* t
   "Is pretty function printing enabled?")
 
-(defvar *fn-table* (make-weak-hash-table :weakness :value)
+(defvar *fn-table* (make-weak-hash-table :weakness :key)
   "A hash table containing all of the functions and their associated
    printers.")
 
@@ -16,28 +16,17 @@
   "Set the printer for the given function."
   (setf (gethash fn *fn-table*) printer))
 
-(defun enable-pretty-function-printing (&optional (priority 0) (table *print-pprint-dispatch*))
-  "Enable pretty function printing. Return true if pretty function
-   printing was previously disabled."
-  (prog2
-    (set-pprint-dispatch 'function 'print-pretty-function priority table)
-    (not *pretty-function-printing-enabled-p*)
-    (setf *pretty-function-printing-enabled-p* t)))
-
-(defun disable-pretty-function-printing ()
-  "Disables pretty function printing. Returns true if pretty function
-   printing was previously enabled."
-  (prog1 *pretty-function-printing-enabled-p*
-    (setf *pretty-function-printing-enabled-p* nil)))
-
 (defun print-pretty-function (s fn)
+  "Print the function FN to the stream S in a pretty way."
   (let ((printer (function-printer fn)))
-    (if (and printer *pretty-function-printing-enabled-p*)
+    (if (and printer *print-functions-pretty*)
         (funcall printer s)
         ;; If there is no printer associated with this function,
         ;; print it normally.
         (let ((*print-pretty* nil))
           (write fn :stream s)))))
+
+(set-pprint-dispatch 'function 'print-pretty-function)
 
 (defmacro with-function-printer (printer fn)
   "Assign the printer that results from evaluating PRINTER, to the
