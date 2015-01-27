@@ -32,7 +32,7 @@
   "Assign the printer that results from evaluating PRINTER, to the
    function that results from evaluating FN."
   `(let ((f ,fn))
-     (setf (gethash f *fn-table*) ,printer)
+     (setf (pretty-function fn) ,printer)
      f))
 
 (defmacro named-lambda (name lambda-list &body body)
@@ -44,7 +44,8 @@
 (defmacro named-lambda* (name-form lambda-list &body body)
   "Create a lambda function that is associated with NAME. Whenever the
    pretty function printing is enabled, a function declared with
-   named-lambda will be printed with its name. NAME is evaluated."
+   named-lambda will be printed with its name. NAME is repeatedly
+   evaluated every time the function is printed."
   `(with-function-printer (lambda (s)
                             (format s "#<named-lambda ~A>" ,name-form))
      (lambda ,lambda-list ,@body)))
@@ -52,5 +53,3 @@
 (defun clear-pretty-function-table ()
   "Remove all printers associated with pretty functions."
   (clrhash *fn-table*))
-
-(provide :pretty-function)

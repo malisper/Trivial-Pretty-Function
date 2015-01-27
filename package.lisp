@@ -5,6 +5,5 @@
            :named-lambda
            :named-lambda*
            :with-function-printer
-
            :clear-pretty-function-table
            :function-printer))
