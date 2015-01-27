@@ -47,9 +47,10 @@
    pretty function printing is enabled, a function declared with
    named-lambda will be printed with its name. NAME is repeatedly
    evaluated every time the function is printed."
-  `(with-function-printer (lambda (s)
-                            (format s "#<named-lambda ~A>" ,name-form))
-     (lambda ,lambda-list ,@body)))
+  (let ((gstream (gensym)))
+    `(with-function-printer (lambda (,gstream)
+                              (format ,gstream "#<named-lambda ~A>" ,name-form))
+       (lambda ,lambda-list ,@body))))
 
 (defun clear-pretty-function-table ()
   "Remove all printers associated with pretty functions."
